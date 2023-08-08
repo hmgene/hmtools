@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
+  .horizon {
+    border-top: solid 1px #000;
+    border-bottom: solid 1px #000;
+    overflow: hidden;
+    position: relative;
+  }
 
-    .horizon {
-        border-top: solid 1px #000;
-        border-bottom: solid 1px #000;
-        overflow: hidden;
-        position: relative;
-    }
+  .horizon + .horizon {
+    border-top: none;
+  }
 
-    .horizon + .horizon {
-        border-top: none;
-    }
-
-    .horizon canvas {
-        display: block;
-        image-rendering: pixelated;
-    }
+  .horizon canvas {
+    display: block;
+    image-rendering: pixelated;
+  }
 
   .horizon .title,
   .horizon .value {
@@ -46,53 +41,24 @@
 <body>
 
 <script src="https://d3js.org/d3.v4.js"></script>
-<script src="https://npmcdn.com/d3-horizon-chart/build/d3-horizon-chart.min.js"></script>
+<script src="https://unpkg.com/d3-horizon-chart@0.0.5"></script>
 
 <script>
+var data=JSON.parse( {{ data | tojson }} );
+alert(data)
 
-    function loadStockData(stock, callback) {
-		    d3.csv('static/horizon.csv',function(rows)/static/'https://bost.ocks.org/mike/cubism/intro/stocks/' + stock + '.csv', function(rows) {
-                rows = rows.map(function(d) {
-console.log(d3.timeParse(d.Date))
-                return [d3.timeParse(d.Date), +d.Open];
-            }).filter(function(d) {
-                return d[1];
-            }).reverse();
-            var date = rows[0][0],
-                compare = rows[400][1],
-                value = rows[0][1],
-                values = [];
+//var data={ "k":"k","v":[1,2,3,4,5] }
+var horizonChart = d3.horizonChart()
+    .height(20)
+.step(10)
+    .colors(['#313695', '#4575b4', '#74add1', '#abd9e9', '#fee090', '#fdae61', '#f46d43', '#d73027']);
 
-            rows.forEach(function(d, i ) {
-                values.push(value = (d[1] - compare) / compare);
-            });
-
-            callback(null, {
-                'stock': stock,
-                'values': values
-            });
-        });
-    }
-
-    var q = d3.queue();
-
-    ['AAPL', 'BIDU', 'SINA', 'GOOG', 'MSFT', 'YHOO', 'ADBE', 'REDF', 'INSP', 'IACI', 'AVID', 'CCUR', 'DELL', 'DGII', 'HPQ', 'SGI', 'SMCI', 'SNDK', 'SYNA'].forEach(function(stock) {
-        q.defer(loadStockData, stock);
-    });
-
-    q.awaitAll(function(error, stocks) {
-        if (error) throw error;
-
-        d3.select('body').selectAll('.horizon')
-            .data(stocks)
-            .enter()
-            .append('div')
-            .attr('class', 'horizon')
-            .each(function(d) {
-                d3.horizonChart()
-                    .title(d.stock)
-                    .call(this, d.values);
-            });
-    });
+var horizons = d3.select('body').selectAll('.horizon')
+    .data([data])
+    .enter().append('div')
+    .attr('class', 'horizon')
+    .each(function(d,i){
+	horizonChart.title(d.k).call(this,d.v)
+	})
 
 </script>
