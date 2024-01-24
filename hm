@@ -1,0 +1,25 @@
+#!/bin/bash
+#BASEDIR=$(dirname $(realpath "$0"));
+BASEDIR=$( cd "$(dirname "$0")" ; pwd -P )
+home(){ echo $BASEDIR; }
+
+if [ $# -lt 1 ];then
+cat<<-eof
+	This is HyunMin
+	Version:   v0.1
+	Mail:      human.gim@gmail.com 
+
+	Usage:     hm <subcommand> 
+
+	<subcommand> :
+	bwa-parallel
+eof
+
+else
+        for f in $BASEDIR/src/*.sh;do
+                . $f
+        done
+#set -e -o pipefail
+        ${@:1}
+fi
+
