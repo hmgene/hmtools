@@ -145,7 +145,7 @@ mrg-bwa(){
 		for f in ${x[@]};do
 			samtools view $f
 		done
-	} | samtools view -bh | samtools sort  -T $o.tmp > $o
+	} | samtools view -bh | samtools sort  -@ 2 -m 32G -T $o.tmp > $o
 	samtools index $o
 	samtools flagstat $o > $o.flagstat.txt
 }
