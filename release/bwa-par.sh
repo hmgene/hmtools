@@ -48,14 +48,22 @@ split-fq(){
 		gunzip -dc $i2 | split -l$l - $o/R2.
 	fi
 }
+
 run-bwa(){
 	i1=$1;i2=${i1/\/R1\./\/R2\.};r=$2;o=${i1/fq\/R1./bwa\/}@$r.bam
+
 	echo "$i1 $i2 => $o"; #return;
 	if [ ! -f $i2 ];then i2="";fi
 	if [ ${!r} -a ! -s $o ];then
 		mkdir -p ${o%\/*}
 		#bwa mem -M -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30  | samtools sort -T $o.tmp - > $o
-		bwa mem -M -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30  > $o
+		bwa mem -M -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30 > $o.tmp
+	        {
+			samtools view -H $o.tmp
+			samtools view $o.tmp |\
+			perl -ne '$_=~/NM:i:(\d+)/; if( $1 <= 3){ print $_;}'
+		} | samtools view -b > $o
+		#rm $o.tmp
 		bam-score $o | gzip -c > $o.id.gz
 	fi
 }
@@ -145,12 +153,14 @@ mrg-bwa(){
 		for f in ${x[@]};do
 			samtools view $f
 		done
-	} | samtools view -bh | samtools sort  -T $o.tmp > $o
+	} | samtools view -bh | samtools sort  -@ 2 -m 32G -T $o.tmp > $o
 	samtools index $o
 	samtools flagstat $o > $o.flagstat.txt
 }
 bwa-parallel(){
-usage="$FUNCNAME <input_R1.fastq.gz>  <out_prefix>"
+usage="
+version: mut<3 
+$FUNCNAME <input_R1.fastq.gz>  <out_prefix> [bwa-options]"
 if [ $# -lt 2 ];then echo "$usage"; return;fi
 	export -f split-fq run-bwa flt-bwa mrg-bwa bam-score 
 	time split-fq $1 $2;
@@ -160,4 +170,4 @@ if [ $# -lt 2 ];then echo "$usage"; return;fi
 }
 
 
-bwa-parallel $1 $2
+bwa-parallel $1 $2 $3
