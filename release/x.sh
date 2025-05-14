@@ -13,6 +13,7 @@ declare -f ck >> $i.sh
 cat ../src/bwa.sh >> $i.sh
 echo "bwa-parallel \$1 \$2 \$3" >> $i.sh
 
-shc -U -v -r -f $i.sh -o $i
+#shc -U -v -r -f $i.sh -o $i
+shc -v -r -f $i.sh -o $i
 
 

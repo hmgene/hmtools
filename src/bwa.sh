@@ -31,14 +31,22 @@ split-fq(){
 		gunzip -dc $i2 | split -l$l - $o/R2.
 	fi
 }
+
 run-bwa(){
 	i1=$1;i2=${i1/\/R1\./\/R2\.};r=$2;o=${i1/fq\/R1./bwa\/}@$r.bam
+
 	echo "$i1 $i2 => $o"; #return;
 	if [ ! -f $i2 ];then i2="";fi
 	if [ ${!r} -a ! -s $o ];then
 		mkdir -p ${o%\/*}
 		#bwa mem -M -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30  | samtools sort -T $o.tmp - > $o
-		bwa mem -M "${3:-""}" -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30  > $o
+		bwa mem -M -t 8 ${!r} $i1 $i2 | samtools view -F0x4 -bhq 30 > $o.tmp
+	        {
+			samtools view -H $o.tmp
+			samtools view $o.tmp |\
+			perl -ne '$_=~/NM:i:(\d+)/; if( $1 <= 3){ print $_;}'
+		} | samtools view -b > $o
+		#rm $o.tmp
 		bam-score $o | gzip -c > $o.id.gz
 	fi
 }
@@ -133,11 +141,13 @@ mrg-bwa(){
 	samtools flagstat $o > $o.flagstat.txt
 }
 bwa-parallel(){
-usage="$FUNCNAME <input_R1.fastq.gz>  <out_prefix> [bwa-options]"
+usage="
+version: mut<3 
+$FUNCNAME <input_R1.fastq.gz>  <out_prefix> [bwa-options]"
 if [ $# -lt 2 ];then echo "$usage"; return;fi
 	export -f split-fq run-bwa flt-bwa mrg-bwa bam-score 
 	time split-fq $1 $2;
-	time parallel -j16 run-bwa {} ${3:-""} ::: ${2%/*}/fq/R1.* ::: ${genomes[@]};
+	time parallel -j16 run-bwa {} ::: ${2%/*}/fq/R1.* ::: ${genomes[@]};
 	time parallel -j16 flt-bwa {} ::: ${2%/*}/bwa/*.bam.id.gz  
 	time parallel -j16 mrg-bwa {} ::: ${2%/*}/bwa_flt ::: ${genomes[@]};
 }
