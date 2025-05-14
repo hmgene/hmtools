@@ -2,6 +2,8 @@
 #BASEDIR=$(dirname $(realpath "$0"));
 BASEDIR=$( cd "$(dirname "$0")" ; pwd -P )
 home(){ echo $BASEDIR; }
+list(){ hm declare -F | sed 's/declare -f //g' ; }
+
 
 if [ $# -lt 1 ];then
 cat<<-eof
