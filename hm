@@ -28,6 +28,6 @@ else
                 . $f
         done
 #set -e -o pipefail
-        ${@:1}
+        echo ${@:1}
 fi
 
