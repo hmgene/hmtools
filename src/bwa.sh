@@ -1,5 +1,5 @@
 #!/bin/bash
-ck samtools parallel 
+#ck samtools parallel 
 
 
 hg38=/mnt/vstor/SOM_GENE_BEG33/ref_files/hg38/bwa_indices/GRChg38.d1.vd1.fa

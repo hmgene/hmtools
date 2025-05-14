@@ -1,18 +1,26 @@
 #!/bin/bash
 #BASEDIR=$(dirname $(realpath "$0"));
 BASEDIR=$( cd "$(dirname "$0")" ; pwd -P )
+export HMHOME=$BASEDIR;
+export PYTHONPATH=$BASEDIR;
 home(){ echo $BASEDIR; }
+list(){ 
+	if [ -z $1 ];then
+		$0 declare -F | sed 's/declare -f //g' ; 
+	else
+		$0 declare -f $1 
+
+	fi
+}
 
 if [ $# -lt 1 ];then
 cat<<-eof
-	This is HyunMin
+	Hyunmin's Tools
 	Version:   v0.1
 	Mail:      human.gim@gmail.com 
-
 	Usage:     hm <subcommand> 
 
 	<subcommand> :
-	bwa-parallel
 eof
 
 else
