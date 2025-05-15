@@ -27,7 +27,6 @@ else
         for f in $BASEDIR/src/*.sh;do
                 . $f
         done
-#set -e -o pipefail
-        echo ${@:1}
+        ${@:1}
 fi
 

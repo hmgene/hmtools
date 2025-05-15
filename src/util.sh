@@ -1,8 +1,9 @@
 
 #!/bin/bash -l
-
-
 BB=$BASEDIR/bin/`uname -sm | tr " " "_"`
+str2num(){
+    echo $1 | tr "[:lower:]" "[:upper:]" | numfmt --from=si
+}
 #LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-./}:$BB
 ck(){
 	echo $@ | tr " " "\n" | while read x;do
