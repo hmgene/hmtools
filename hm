@@ -3,6 +3,7 @@
 BASEDIR=$( cd "$(dirname "$0")" ; pwd -P )
 export HMHOME=$BASEDIR;
 export PYTHONPATH=$BASEDIR;
+export PATH=$PATH:$HMHOME/bin;
 home(){ echo $BASEDIR; }
 list(){ 
 	if [ -z $1 ];then

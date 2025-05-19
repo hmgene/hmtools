@@ -1,0 +1,4 @@
+#!/bin/bash
+BASEDIR=$( cd "$(dirname "$0")" ; pwd -P )
+BB=$BASEDIR/`uname -sm | tr " " "_"`
+$BB/`basename $0` $@
