@@ -4,7 +4,6 @@ mcool2bg(){
 usage="$FUNCNAME <mcool> <resolution>";
 if [ $# -lt 1 ];then echo "$usage";return;fi
 local i=$1::resolutions/`echo ${2:-5k}| hm str2num`
-
 python <( echo 'import cooler,sys
 clr=cooler.Cooler("'$i'")
 import src.neo
