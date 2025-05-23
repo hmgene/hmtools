@@ -1,8 +1,21 @@
+bedw(){
+usage="$FUNCNAME <bed> <window>";
+if [ $# -lt 2 ];then echo "$usage";return;fi;
+    w=`echo $2 | hm str2num -`
+    cat | awk -v OFS="\t" -v w=$w '{ $2=$2-w;$3=$3+w;print $0;}'
+}
+
+bed5p(){
+if [ $# -lt 1 ];then echo "$usage";return;fi;
+    cat $1 | perl -ne 'chomp;my($c,$s,$e,$n,$v,$t)=split/\t/,$_;my $p= $t eq "+" ? $s : $e -1;  print join("\t",$c,$p,$p+1,$n,$v,$t),"\n";'
+}
+
+
 bg2bw () 
 { 
     usage="$FUNCNAME <bg> [<genome=hg38>]";
     local tmpd=$( mktemp -d );
-    cat $HMHOME/data/${2:-hg38}.chrom.sizes > $tmpd/b;
+    hm ucsc-chromsize ${2:-hg38} > $tmpd/b;
     cat $1 | perl -e 'use strict;
 		my %r=();
 		map {chomp; my($k,$v)=split/\t/,$_; $r{$k}=$v; } `cat '$tmpd/b'`;
